@@ -48,17 +48,18 @@ public class SecurityConfig {
 
         http
                 //TODO hay que activarlo cuando esté lo demás montado
+                //Desactivado facilita las pruebas
                 .csrf(AbstractHttpConfigurer::disable)
                 // Autorizacion de rutas
                 .authorizeHttpRequests(auth -> auth
                         // Dejamos pasar estos para que puedan ver los estilos
                         .requestMatchers("/login/css/**","/js/**").permitAll()
                         // Para que se puedan logear
-                        .requestMatchers("/","/register").permitAll()
+                        .requestMatchers("/").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        // TODO cuando haga el front hay que cambiarlo por /login
+                        // TODO cuando termine el front hay que cambiarlo por /login
                         .defaultSuccessUrl("/chat", true) // A dónde va si el login es correcto
                         .permitAll()
                 )
