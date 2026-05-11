@@ -1,8 +1,10 @@
 package es.gabriel.myrmidonai.service;
 
+import es.gabriel.myrmidonai.model.AuditLog;
 import es.gabriel.myrmidonai.model.Document;
 import es.gabriel.myrmidonai.model.SecurityLevel;
 import es.gabriel.myrmidonai.model.User;
+import es.gabriel.myrmidonai.repository.AuditLogRepository;
 import es.gabriel.myrmidonai.repository.DocumentRepository;
 import es.gabriel.myrmidonai.repository.UserRepository;
 import es.gabriel.myrmidonai.service.DocumentService;
@@ -30,16 +32,18 @@ public class DocumentServiceImpl implements DocumentService {
     private final UserRepository userRepository;
     private final VectorStore vectorStore;
     private final Path rootLocation;
+    private final AuditLogRepository auditLogRepository;
 
     public DocumentServiceImpl(DocumentRepository documentRepository,
                                UserRepository userRepository,
                                VectorStore vectorStore,
-                               @Value("${myrmidon.upload-dir}") String uploadDir) {
+                               @Value("${myrmidon.upload-dir}") String uploadDir, AuditLogRepository auditLogRepository) {
 
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
         this.vectorStore = vectorStore;
         this.rootLocation = Paths.get(uploadDir);
+        this.auditLogRepository = auditLogRepository;
 
         try {
             Files.createDirectories(rootLocation);
@@ -69,6 +73,15 @@ public class DocumentServiceImpl implements DocumentService {
         doc.setOwner(owner);
 
         Document savedDoc = documentRepository.save(doc);
+
+        // Guarda el resgistro de el registro de auditoría
+        AuditLog log = new AuditLog();
+        log.setTimestamp(LocalDateTime.now());
+        log.setUsername(owner.getUsername());
+        log.setAction("UPLOAD_DOCUMENT");
+        log.setDetails("The user uploaded pdf: " + file.getOriginalFilename() + " [" + level + "] ");
+        log.setAuthorized(true);
+        auditLogRepository.save(log);
 
         //Lanzo la ingesta hacia la IA
         ingestDocument(savedDoc);
