@@ -41,10 +41,11 @@ public class DocumentController {
         }
 
         try {
-            documentService.ingestPdfDocument(file, securityLevel, principal.getName());
+            documentService.saveDocument(file, principal.getName(), securityLevel);
             return ResponseEntity.ok("Documento '" + file.getOriginalFilename() + "' subido y procesado correctamente.");
 
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(500).body("Error al procesar el documento: " + e.getMessage());
 
         }
