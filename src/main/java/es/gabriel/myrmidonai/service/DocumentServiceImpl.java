@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
@@ -84,7 +85,16 @@ public class DocumentServiceImpl implements DocumentService {
         auditLogRepository.save(log);
 
         //Lanzo la ingesta hacia la IA
-        ingestDocument(savedDoc);
+        // Aquí puedo explicar el problema que hubo con que usar para de forma asíncrona poder ingestar varias cosas a la vez y porque no servían los hilos o las pool normales
+        //o mejor dicho por qué no son tan eficientes
+        CompletableFuture.runAsync(()->{
+            try {
+                ingestDocument(savedDoc);
+            } catch (Exception e) {
+                System.err.println(" Error critico en el segundo plano con la IA: " + e.getMessage());
+            }
+        });
+
 
         return savedDoc;
     }
