@@ -7,7 +7,6 @@ import es.gabriel.myrmidonai.model.User;
 import es.gabriel.myrmidonai.repository.AuditLogRepository;
 import es.gabriel.myrmidonai.repository.DocumentRepository;
 import es.gabriel.myrmidonai.repository.UserRepository;
-import es.gabriel.myrmidonai.service.DocumentService;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
