@@ -7,5 +7,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatRequest {
     private String message;
-
+    private Long conversationId; // Devuelve el ID del chat actual
 }

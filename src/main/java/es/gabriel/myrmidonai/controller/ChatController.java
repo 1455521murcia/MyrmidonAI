@@ -25,19 +25,24 @@ public class ChatController {
 
         // Valido si no está vacio
         if (request.getMessage() == null || request.getMessage().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body(new ChatResponse("El mensaje no puede estar vacío."));
+            return ResponseEntity.badRequest().body(new ChatResponse("El mensaje no puede estar vacío.", null));
         }
-
         try {
+            // Delegamos la lógica al servicio
+            // Pasamos: la pregunta, el nombre del usuario logueado y el ID del chat (puede ser null)
+            ChatResponse response = chatService.processQuestion(
+                    request.getMessage(),
+                    principal.getName(),
+                    request.getConversationId()
+            );
 
-            String respuestaIA = chatService.processQuestion(request.getMessage(), principal.getName());
-
-            // Devolvemos la respuesta de la IA en nuestro DTO
-            return ResponseEntity.ok(new ChatResponse(respuestaIA));
+            // Devolvemos el DTO completo con estado 200 OK
+            return ResponseEntity.ok(response);
 
         } catch (Exception e) {
+            // Manejo de errores (importante para que no colapse el servidor)
             e.printStackTrace();
-            return ResponseEntity.status(500).body(new ChatResponse("Error interno al procesar la pregunta."));
+            return ResponseEntity.status(500).body(new ChatResponse("Error interno al procesar la pregunta: " + e.getMessage(), null));
         }
     }
 }

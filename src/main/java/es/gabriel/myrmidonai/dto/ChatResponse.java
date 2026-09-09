@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChatResponse {
     private String reply;
+    private Long conversationId; // Devuelve el ID del chat actual
 
 }
