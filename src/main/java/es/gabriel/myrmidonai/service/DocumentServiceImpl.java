@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
@@ -33,17 +34,19 @@ public class DocumentServiceImpl implements DocumentService {
     private final VectorStore vectorStore;
     private final Path rootLocation;
     private final AuditLogRepository auditLogRepository;
+    private final Executor taskExecutor; // NUEVO
 
     public DocumentServiceImpl(DocumentRepository documentRepository,
                                UserRepository userRepository,
                                VectorStore vectorStore,
-                               @Value("${myrmidon.upload-dir}") String uploadDir, AuditLogRepository auditLogRepository) {
+                               @Value("${myrmidon.upload-dir}") String uploadDir, AuditLogRepository auditLogRepository, Executor taskExecutor) {
 
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
         this.vectorStore = vectorStore;
         this.rootLocation = Paths.get(uploadDir);
         this.auditLogRepository = auditLogRepository;
+        this.taskExecutor = taskExecutor;
 
         try {
             Files.createDirectories(rootLocation);
@@ -92,7 +95,7 @@ public class DocumentServiceImpl implements DocumentService {
             } catch (Exception e) {
                 System.err.println(" Error critico en el segundo plano con la IA: " + e.getMessage());
             }
-        });
+        },taskExecutor);// NUEVO
 
 
         return savedDoc;
