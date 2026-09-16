@@ -4,6 +4,7 @@ import es.gabriel.myrmidonai.model.User;
 import es.gabriel.myrmidonai.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -18,6 +19,7 @@ import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     // Usamos BCryptPasswordEncoder para encriptar y comprobar las contraseñas de los usuarios
@@ -37,8 +39,7 @@ public class SecurityConfig {
                     myUser.getUsername(),
                     myUser.getPassword(),
                     // Se usa ROLE_ porque Spring lo suele pedir asi
-                    Collections.singleton(new SimpleGrantedAuthority("ROLE_" +
-                            myUser.getRole().name()))
+                    Collections.singleton(new SimpleGrantedAuthority(myUser.getRole().name()))
             );
         };
     }
